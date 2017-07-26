@@ -16,6 +16,8 @@
 
 package io.realm;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -228,6 +230,19 @@ public class SyncManager {
             RealmLog.debug("last session dropped, remove network listener");
             NetworkStateReceiver.removeListener(networkListener);
         }
+    }
+
+    static synchronized List<SyncSession> getAllSessions(SyncUser syncUser) {
+        if (syncUser == null) {
+            throw new IllegalArgumentException("A non-empty 'syncUser' is required.");
+        }
+        ArrayList<SyncSession> allSessions = new ArrayList<SyncSession>();
+        for (SyncSession syncSession : sessions.values()) {
+            if (syncSession.getUser().equals(syncUser)) {
+                allSessions.add(syncSession);
+            }
+        }
+        return allSessions;
     }
 
     static AuthenticationServer getAuthServer() {
